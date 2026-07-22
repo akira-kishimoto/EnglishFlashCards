@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>English Flash Cards</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    text-align:center;
+    background:#ffffff;
+    margin-top:50px;
+}
+
+#number{
+    font-size:24px;
+    color:#666;
+    margin-bottom:20px;
+}
+
+#question{
+    font-size:40px;
+    font-weight:bold;
+    margin:30px;
+}
+
+#answer{
+    font-size:42px;
+    color:blue;
+    font-weight:bold;
+    margin:30px;
+
+    min-height:70px;      /* 常に高さを確保 */
+    visibility:hidden;    /* 見えないだけで場所は残す */
+}
+
+#count{
+    font-size:30px;
+    color:red;
+    margin:20px;
+}
+
+button{
+    font-size:22px;
+    padding:10px 20px;
+}
+</style>
+
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#1976d2">
+
+</head>
+
+<body>
+
+<h2>English Flash Cards</h2>
+
+<div id="number"></div>
+
+<div id="question"></div>
+
+<div id="answer"></div>
+
+<div style="margin-top:30px;">
+
+<button onclick="prevCard()">◀ 前の問題</button>
+
+<button onclick="togglePause()" id="pauseBtn">⏸ 一時停止</button>
+
+<button onclick="nextCardManual()">▶ 次の問題</button>
+
+<button onclick="speak()">🔊 発音</button>
+
+</div>
+<div style="margin:20px;">
+
+問題番号へジャンプ：
+<input type="number" id="jumpNo" min="1" style="width:80px;font-size:20px;">
+
+<button onclick="jumpCard()">移動</button>
+
+</div>
+
+<div id="count"></div>
+
+<script src="cards.js"></script>
+
+<script>
+
+let index = -1;
+
+let paused = false;
+
+let countdownTimer = null;
+
+let nextTimer = null;
+
+function nextCard(){
+
+    index++;
+
+    if(index>=cards.length){
+        index=0;
+    }
+
+    document.getElementById("number").innerHTML =
+        "問題 " + cards[index].no + " / " + cards.length;
+
+    document.getElementById("question").innerHTML =
+        cards[index].jp;
+
+    // 英文を非表示（スペースは残す）
+    document.getElementById("answer").innerHTML = "&nbsp;";
+    document.getElementById("answer").style.visibility = "hidden";
+
+    questionTimer();
+
+}
+
+function questionTimer(){
+
+    let sec = 3;
+
+    document.getElementById("count").innerHTML = sec;
+
+    countdownTimer = setInterval(function(){
+
+        if(paused) return;
+
+        sec--;
+
+        if(sec>0){
+
+            document.getElementById("count").innerHTML = sec;
+
+        }else{
+
+            clearInterval(countdownTimer);
+
+            showAnswer();
+
+        }
+
+    },1000);
+
+}
+
+function showAnswer(){
+
+    document.getElementById("answer").innerHTML = cards[index].en;
+
+    document.getElementById("answer").style.visibility="visible";
+    let sec = 5;
+
+    document.getElementById("count").innerHTML = "次まで " + sec;
+
+    nextTimer = setInterval(function(){
+
+        if(paused) return;
+
+        sec--;
+
+        if(sec>0){
+
+            document.getElementById("count").innerHTML = "次まで " + sec;
+
+        }else{
+
+            clearInterval(nextTimer);
+
+            nextCard();
+
+        }
+
+    },1000);
+
+}
+
+function togglePause(){
+
+    paused = !paused;
+
+    document.getElementById("pauseBtn").innerHTML =
+        paused ? "▶ 再開" : "⏸ 一時停止";
+
+}
+
+function prevCard(){
+
+    clearInterval(countdownTimer);
+
+    clearInterval(nextTimer);
+
+    index--;
+
+    if(index < 0){
+
+        index = cards.length - 1;
+
+    }
+
+    index--;
+
+    nextCard();
+
+}
+
+function jumpCard(){
+
+    let no = parseInt(document.getElementById("jumpNo").value);
+
+    if(isNaN(no)){
+        alert("問題番号を入力してください。");
+        return;
+    }
+
+    // タイマー停止
+    clearInterval(countdownTimer);
+    clearInterval(nextTimer);
+
+    // 指定番号を検索
+    let found = cards.findIndex(card => card.no == no);
+
+    if(found === -1){
+        alert("その問題番号はありません。");
+        return;
+    }
+
+    index = found - 1;
+
+    nextCard();
+
+}
+
+function nextCardManual(){
+
+    clearInterval(countdownTimer);
+
+    clearInterval(nextTimer);
+
+    nextCard();
+
+}
+function speak(){
+
+    speechSynthesis.cancel();
+
+    let msg=new SpeechSynthesisUtterance(cards[index].en);
+
+    msg.lang="en-US";
+
+    speechSynthesis.speak(msg);
+
+}
+
+nextCard();
+
+document.getElementById("jumpNo").addEventListener("keydown",function(e){
+
+    if(e.key==="Enter"){
+
+        jumpCard();
+
+    }
+
+});
+
+</script>
+
+<script>
+
+if("serviceWorker" in navigator){
+
+    navigator.serviceWorker.register("service-worker.js");
+
+}
+
+</script>
+
+</body>
+</html>
