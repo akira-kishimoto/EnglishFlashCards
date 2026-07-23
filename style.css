@@ -1,0 +1,344 @@
+/* ==========================================
+   English Flash Cards Version 2
+   style.css
+========================================== */
+
+:root{
+
+    --bg:#f2f2f7;
+    --card:#ffffff;
+    --text:#1d1d1f;
+    --sub:#6e6e73;
+    --blue:#007aff;
+    --shadow:0 8px 20px rgba(0,0,0,.08);
+
+}
+
+*{
+
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+
+}
+
+body{
+
+    font-family:-apple-system,BlinkMacSystemFont,
+    "Segoe UI",sans-serif;
+
+    background:var(--bg);
+
+    color:var(--text);
+
+    line-height:1.5;
+
+}
+
+.container{
+
+    max-width:800px;
+
+    margin:auto;
+
+    padding:20px;
+
+}
+
+header{
+
+    text-align:center;
+
+    margin-bottom:25px;
+
+}
+
+header h1{
+
+    font-size:2rem;
+
+    font-weight:700;
+
+}
+
+.progressText{
+
+    font-size:1rem;
+
+    color:var(--sub);
+
+    margin-top:8px;
+
+}
+
+.progress{
+
+    width:100%;
+
+    height:12px;
+
+    background:#ddd;
+
+    border-radius:30px;
+
+    overflow:hidden;
+
+    margin-top:10px;
+
+}
+
+.progressBar{
+
+    width:0;
+
+    height:100%;
+
+    background:var(--blue);
+
+    transition:.3s;
+
+}
+
+.card{
+
+    background:var(--card);
+
+    border-radius:22px;
+
+    box-shadow:var(--shadow);
+
+    padding:28px;
+
+    margin-top:22px;
+
+    animation:fade .4s;
+
+}
+
+.cardTitle{
+
+    color:var(--sub);
+
+    font-size:.9rem;
+
+    margin-bottom:12px;
+
+}
+
+.jp{
+
+    font-size:2rem;
+
+    font-weight:700;
+
+}
+
+.en{
+
+    font-size:1.8rem;
+
+    color:#003366;
+
+}
+
+.countdown{
+
+    text-align:center;
+
+    font-size:3rem;
+
+    font-weight:bold;
+
+    color:var(--blue);
+
+    margin:25px;
+
+}
+
+.buttons{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:15px;
+
+    margin-top:20px;
+
+}
+
+button{
+
+    border:none;
+
+    border-radius:18px;
+
+    background:var(--blue);
+
+    color:white;
+
+    font-size:1.1rem;
+
+    font-weight:bold;
+
+    padding:18px;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+button:hover{
+
+    transform:translateY(-2px);
+
+}
+
+button:active{
+
+    transform:scale(.96);
+
+}
+
+.jumpArea{
+
+    margin-top:30px;
+
+    text-align:center;
+
+}
+
+input{
+
+    width:90px;
+
+    padding:12px;
+
+    font-size:1.2rem;
+
+    text-align:center;
+
+    border-radius:10px;
+
+    border:1px solid #ccc;
+
+}
+
+footer{
+
+    text-align:center;
+
+    margin-top:40px;
+
+    color:var(--sub);
+
+    font-size:.9rem;
+
+}
+
+/* アニメーション */
+
+@keyframes fade{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(10px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+/* iPhone */
+
+@media(max-width:600px){
+
+    header h1{
+
+        font-size:1.6rem;
+
+    }
+
+    .jp{
+
+        font-size:1.7rem;
+
+    }
+
+    .en{
+
+        font-size:1.5rem;
+
+    }
+
+    button{
+
+        padding:20px;
+
+        font-size:1rem;
+
+    }
+
+}
+
+/* iPad */
+
+@media(min-width:601px) and (max-width:1024px){
+
+    .container{
+
+        max-width:700px;
+
+    }
+
+}
+
+/* Dark Mode */
+
+@media(prefers-color-scheme:dark){
+
+:root{
+
+    --bg:#111111;
+
+    --card:#222222;
+
+    --text:#ffffff;
+
+    --sub:#bbbbbb;
+
+}
+
+.en{
+
+    color:#7cc8ff;
+
+}
+
+.progress{
+
+    background:#444;
+
+}
+
+input{
+
+    background:#333;
+
+    color:white;
+
+    border:1px solid #555;
+
+}
+
+}
