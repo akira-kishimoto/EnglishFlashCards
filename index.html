@@ -2,280 +2,78 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#2F80ED">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="English Flash Cards">
+<meta name="format-detection" content="telephone=no">
 <title>English Flash Cards</title>
 
-<style>
-body{
-    font-family: Arial, sans-serif;
-    text-align:center;
-    background:#ffffff;
-    margin-top:50px;
-}
-
-#number{
-    font-size:24px;
-    color:#666;
-    margin-bottom:20px;
-}
-
-#question{
-    font-size:40px;
-    font-weight:bold;
-    margin:30px;
-}
-
-#answer{
-    font-size:42px;
-    color:blue;
-    font-weight:bold;
-    margin:30px;
-
-    min-height:70px;      /* 常に高さを確保 */
-    visibility:hidden;    /* 見えないだけで場所は残す */
-}
-
-#count{
-    font-size:30px;
-    color:red;
-    margin:20px;
-}
-
-button{
-    font-size:22px;
-    padding:10px 20px;
-}
-</style>
-
 <link rel="manifest" href="manifest.json">
-
-<meta name="theme-color" content="#1976d2">
-
+<link rel="apple-touch-icon" href="icon/icon-192.png">
+<link rel="icon" href="icon/icon-192.png">
+<link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<h2>English Flash Cards</h2>
+<div id="app">
 
-<div id="number"></div>
+<header class="header">
+<h1>English Flash Cards</h1>
+<p class="version">Version 2.0</p>
+</header>
 
-<div id="question"></div>
+<section class="progressSection" aria-label="Progress">
+<div class="progressContainer">
+<div class="progressBackground">
+<div id="progressBar" class="progressBar"></div>
+</div>
+</div>
+<div id="progressText" class="progressText">0 / 0</div>
+</section>
 
-<div id="answer"></div>
+<main class="mainContent">
 
-<div style="margin-top:30px;">
+<section class="flashCard" aria-label="Flash Card">
+<div id="jp" class="jp"></div>
+<div id="countdown" class="countdown"></div>
+<div id="en" class="en"></div>
+</section>
 
-<button onclick="prevCard()">◀ 前の問題</button>
+<nav class="controlArea" aria-label="Controls">
+<button id="prevButton" type="button" onclick="prevCard()">◀ Previous</button>
+<button id="speakButton" type="button" onclick="speak()">🔊 Speak</button>
+<button id="nextButton" type="button" onclick="nextCard()">Next ▶</button>
+</nav>
 
-<button onclick="togglePause()" id="pauseBtn">⏸ 一時停止</button>
+<section class="jumpSection">
+<label for="jumpNo">Card Number</label>
+<input id="jumpNo" type="number" min="1" step="1" inputmode="numeric" autocomplete="off">
+<button id="jumpButton" type="button" onclick="jumpCard()">Go</button>
+</section>
 
-<button onclick="nextCardManual()">▶ 次の問題</button>
+</main>
 
-<button onclick="speak()">🔊 発音</button>
+<footer class="footer">
+<p>English Flash Cards Version 2.0</p>
+</footer>
 
 </div>
-<div style="margin:20px;">
 
-問題番号へジャンプ：
-<input type="number" id="jumpNo" min="1" style="width:80px;font-size:20px;">
-
-<button onclick="jumpCard()">移動</button>
-
-</div>
-
-<div id="count"></div>
+<noscript>
+<p>This application requires JavaScript.</p>
+</noscript>
 
 <script src="cards.js"></script>
-
+<script src="app.js"></script>
 <script>
-
-let index = -1;
-
-let paused = false;
-
-let countdownTimer = null;
-
-let nextTimer = null;
-
-function nextCard(){
-
-    index++;
-
-    if(index>=cards.length){
-        index=0;
-    }
-
-    document.getElementById("number").innerHTML =
-        "問題 " + cards[index].no + " / " + cards.length;
-
-    document.getElementById("question").innerHTML =
-        cards[index].jp;
-
-    // 英文を非表示（スペースは残す）
-    document.getElementById("answer").innerHTML = "&nbsp;";
-    document.getElementById("answer").style.visibility = "hidden";
-
-    questionTimer();
-
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js")
+      .catch(err => console.error(err));
+  });
 }
-
-function questionTimer(){
-
-    let sec = 3;
-
-    document.getElementById("count").innerHTML = sec;
-
-    countdownTimer = setInterval(function(){
-
-        if(paused) return;
-
-        sec--;
-
-        if(sec>0){
-
-            document.getElementById("count").innerHTML = sec;
-
-        }else{
-
-            clearInterval(countdownTimer);
-
-            showAnswer();
-
-        }
-
-    },1000);
-
-}
-
-function showAnswer(){
-
-    document.getElementById("answer").innerHTML = cards[index].en;
-
-    document.getElementById("answer").style.visibility="visible";
-    let sec = 5;
-
-    document.getElementById("count").innerHTML = "次まで " + sec;
-
-    nextTimer = setInterval(function(){
-
-        if(paused) return;
-
-        sec--;
-
-        if(sec>0){
-
-            document.getElementById("count").innerHTML = "次まで " + sec;
-
-        }else{
-
-            clearInterval(nextTimer);
-
-            nextCard();
-
-        }
-
-    },1000);
-
-}
-
-function togglePause(){
-
-    paused = !paused;
-
-    document.getElementById("pauseBtn").innerHTML =
-        paused ? "▶ 再開" : "⏸ 一時停止";
-
-}
-
-function prevCard(){
-
-    clearInterval(countdownTimer);
-
-    clearInterval(nextTimer);
-
-    index--;
-
-    if(index < 0){
-
-        index = cards.length - 1;
-
-    }
-
-    index--;
-
-    nextCard();
-
-}
-
-function jumpCard(){
-
-    let no = parseInt(document.getElementById("jumpNo").value);
-
-    if(isNaN(no)){
-        alert("問題番号を入力してください。");
-        return;
-    }
-
-    // タイマー停止
-    clearInterval(countdownTimer);
-    clearInterval(nextTimer);
-
-    // 指定番号を検索
-    let found = cards.findIndex(card => card.no == no);
-
-    if(found === -1){
-        alert("その問題番号はありません。");
-        return;
-    }
-
-    index = found - 1;
-
-    nextCard();
-
-}
-
-function nextCardManual(){
-
-    clearInterval(countdownTimer);
-
-    clearInterval(nextTimer);
-
-    nextCard();
-
-}
-function speak(){
-
-    speechSynthesis.cancel();
-
-    let msg=new SpeechSynthesisUtterance(cards[index].en);
-
-    msg.lang="en-US";
-
-    speechSynthesis.speak(msg);
-
-}
-
-nextCard();
-
-document.getElementById("jumpNo").addEventListener("keydown",function(e){
-
-    if(e.key==="Enter"){
-
-        jumpCard();
-
-    }
-
-});
-
-</script>
-
-<script>
-
-if("serviceWorker" in navigator){
-
-    navigator.serviceWorker.register("service-worker.js");
-
-}
-
 </script>
 
 </body>
